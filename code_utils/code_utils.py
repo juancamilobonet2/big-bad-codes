@@ -2,20 +2,21 @@ import numpy as np
 
 # cosas generales de coding theory
 
-class Binary_Matrix:
-    def __init__(self,n,k, matrix=[]):
-        self.n = n
-        self.k = k
-        if matrix == []:
-            self.matrix = np.zeros((k,n),dtype=int)
-        else:
-            self.matrix = matrix
+# creo que en vd no hace falta
+# class Binary_Matrix:
+#     def __init__(self,n,k, matrix=[]):
+#         self.n = n
+#         self.k = k
+#         if matrix == []:
+#             self.matrix = np.zeros((k,n),dtype=int)
+#         else:
+#             self.matrix = matrix
     
-    def __str__(self):
-        return str(self.matrix)
+#     def __str__(self):
+#         return str(self.matrix)
 
-    def get_matrix(self):
-        return self.matrix
+#     def get_matrix(self):
+#         return self.matrix
     
 # operaciones modulo 2
 def add_matrices(matrix1, matrix2):
