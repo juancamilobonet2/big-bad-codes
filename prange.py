@@ -1,6 +1,5 @@
 import numpy as np
 import math
-import random
 import code_utils as cu
 
 def prange(s, H, t):
