@@ -30,6 +30,11 @@ def prange(s, H, t):
     
     return cu.multiply_matrices(np.array([e_hat]), rand_permutation)
 
+def concat_matrix(matrix):
+    # Convierte la matriz NumPy a una cadena
+    concatenated_string = ''.join(map(str, matrix.flatten()))
+
+    return concatenated_string
 
 
 if __name__ == "__main__":
@@ -45,17 +50,17 @@ if __name__ == "__main__":
     [0,0,1,0,0,0,0,0,1,1,1,0],
     [0,1,0,0,0,0,0,1,0,1,0,1],
     [0,1,1,1,1,0,1,1,1,0,0,1]])
-    
-    r = np.array([1,1,0,0,0,0,0,0,0,0,0,0]) #110000000000
+
+    r = np.array([[1,1,0,0,0,0,0,0,0,0,0,0]]) #110000000000
     s = cu.find_syndrome(H,r)
 
     e = prange(s,H,t)
     computed_s = cu.find_syndrome(H, e)
 
     # en teoria, H*e^t = s
-    print("Error vector: \n", e)
-    print("Syndrome: \n", computed_s)
-    print("actual syndrome: \n ", s)
+    print("Error vector: \n", concat_matrix(e))
+    print("Syndrome: \n", concat_matrix(computed_s))
+    print("actual syndrome: \n ", concat_matrix(s))
     print("Error weight: ", np.sum(e))
 
     successes = 0
@@ -64,6 +69,13 @@ if __name__ == "__main__":
         computed_s = cu.find_syndrome(H, e)
         if np.array_equal(computed_s, s):
             successes += 1
+        if i%30 == 0 or np.array_equal(computed_s, s):
+            print("SUCCESS:",np.array_equal(computed_s, s))
+            print("Error vector: \n", concat_matrix(e))
+            print("Syndrome: \n", concat_matrix(computed_s))
+            print("actual syndrome: \n ", concat_matrix(s))
+            print("Error weight: ", np.sum(e))
+            print("---------------------")
     
     print("Successes: ", successes)
     print("Success rate: ", successes/1000)
