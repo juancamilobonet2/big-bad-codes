@@ -54,12 +54,18 @@ if __name__ == "__main__":
     
     n = H.shape[1]
     t=2
-    print("Test ID \t Outcome \t Expected \t\t Result")
+    print("Test ID \t Outcome \t Expected \t\t Result \t iterations")
     test_id = 0
     for r in test:
+        iterations = 0
         recieved = np.array([r])
+        while iterations < 1000:
+            s = cu.find_syndrome(H, recieved)
+            e = prange(s,H,t)
+            computed_s = cu.find_syndrome(H, e)
+            if np.array_equal(s, computed_s):
+                break
+            iterations += 1
+        
 
-        s = cu.find_syndrome(H, recieved)
-        e = prange(s,H,t)
-        computed_s = cu.find_syndrome(H, e)
-        print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]}")
+        print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]}, \t {iterations}")
