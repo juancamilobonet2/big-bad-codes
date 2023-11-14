@@ -39,7 +39,6 @@ def random_permutation_matrix(n):
         permutation_matrix[i,permutation[i]-1] = 1
     return permutation_matrix
 
-
 def gaussian_elimination(matrix, start_column=0):
     """
     Gaussian elimination modulo 2
@@ -82,3 +81,14 @@ if __name__ == "__main__":
     r = np.array([[1,1,0,1,1,0]])
     print(find_syndrome(parity_check,r))
     print(random_permutation_matrix(6))
+
+# Number of columns.
+def permutation_matrix(n, list_of_perms):
+    print(list_of_perms)
+    identity = np.identity(n)
+    for perm in list_of_perms:
+        origin, end = perm
+        for row_num in range(len(identity)):
+            identity[row_num][origin], identity[row_num][end] = \
+                identity[row_num][end], identity[row_num][origin]
+    return identity
