@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import code_utils as cu
+import time
 
 def prange(s, H, t):
     """
@@ -54,11 +55,15 @@ if __name__ == "__main__":
     
     n = H.shape[1]
     t=2
-    print("Test ID \t Outcome \t Expected \t\t Result \t iterations")
-    test_id = 0
+    print("Test ID \t Outcome \t Expected \t\t Result \t iterations \t time")
+    test_id = 0 
+    total_iters = 0
+    total_time = 0
     for r in test:
-        iterations = 0
+        iterations = 1
         recieved = np.array([r])
+
+        start_time = time.time()
         while iterations < 1000:
             s = cu.find_syndrome(H, recieved)
             e = prange(s,H,t)
@@ -66,6 +71,12 @@ if __name__ == "__main__":
             if np.array_equal(s, computed_s):
                 break
             iterations += 1
-        
+        end_time = time.time()
+        elapsed_time = end_time - start_time
 
-        print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]}, \t {iterations}")
+        print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]} \t {iterations} \t \t {elapsed_time}s")
+        test_id += 1
+        total_iters += iterations
+        total_time += elapsed_time
+    print(f"Average iterations: {total_iters/test_id}")
+    print(f"Average time: {total_time/test_id}s")
