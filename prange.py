@@ -27,7 +27,6 @@ def prange(s, H, t):
         e_hat = np.hstack((e_hat, s_bar.transpose()[0]))
 
         current_weight = np.sum(e_hat)
-    
     return cu.multiply_matrices(np.array([e_hat]), rand_permutation)
 
 def concat_matrix(matrix):
@@ -39,45 +38,28 @@ def concat_matrix(matrix):
 
 if __name__ == "__main__":
     print("Prange's algorithm")
-    n = 12
-    k = 4
-    t = 2
-    H = np.array([[0,0,1,0,1,0,0,0,0,0,0,1],
-    [0,1,1,1,0,0,0,0,1,0,0,0],
-    [0,0,0,0,1,1,0,1,0,1,1,1],
-    [1,1,0,0,0,1,1,1,0,0,0,0],
-    [1,1,1,1,0,0,1,0,1,1,1,1],
-    [0,0,1,0,0,0,0,0,1,1,1,0],
-    [0,1,0,0,0,0,0,1,0,1,0,1],
-    [0,1,1,1,1,0,1,1,1,0,0,1]])
+    h_file = open("./test/goppa_h.txt", "r")
+    H = []
+    for line in h_file:
+        H.append([int(x) for x in list(line.strip())])
+    h_file.close()
+    H = np.array(H)
 
-    r = np.array([[1,1,0,0,0,0,0,0,0,0,0,0]]) #110000000000
-    s = cu.find_syndrome(H,r)
+    test_file = open("./test/goppa_test.txt", "r")
+    test = []
+    for line in test_file:
+        test.append([int(x) for x in list(line.strip())])   
+    test_file.close()
 
-    e = prange(s,H,t)
-    computed_s = cu.find_syndrome(H, e)
+    
+    n = H.shape[1]
+    t=2
+    print("Test ID \t Outcome \t Expected \t\t Result")
+    test_id = 0
+    for r in test:
+        recieved = np.array([r])
 
-    # en teoria, H*e^t = s
-    print("Error vector: \n", concat_matrix(e))
-    print("Syndrome: \n", concat_matrix(computed_s))
-    print("actual syndrome: \n ", concat_matrix(s))
-    print("Error weight: ", np.sum(e))
-
-    successes = 0
-    for i in range(1000):
+        s = cu.find_syndrome(H, recieved)
         e = prange(s,H,t)
         computed_s = cu.find_syndrome(H, e)
-        if np.array_equal(computed_s, s):
-            successes += 1
-        if i%30 == 0 or np.array_equal(computed_s, s):
-            print("SUCCESS:",np.array_equal(computed_s, s))
-            print("Error vector: \n", concat_matrix(e))
-            print("Syndrome: \n", concat_matrix(computed_s))
-            print("actual syndrome: \n ", concat_matrix(s))
-            print("Error weight: ", np.sum(e))
-            print("---------------------")
-    
-    print("Successes: ", successes)
-    print("Success rate: ", successes/1000)
-
-
+        print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]}")
