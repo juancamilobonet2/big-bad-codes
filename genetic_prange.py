@@ -29,9 +29,12 @@ def mutation(individual: list[tuple[int]], column_num: int):
     origin_or_destiny = random.randint(0,1)
     # Generates the new column to be put, must be part of H.
     random_new_column = random.randint(0, column_num-1)
-    A = (decision for decision in [origin_or_destiny, origin_or_destiny^1])
     new_ind = copy.deepcopy(individual)
-    new_ind[random_position][origin_or_destiny] = random_new_column
+    old_tuple = new_ind[random_position]
+    if origin_or_destiny == 0:
+        new_ind[random_position] = (random_new_column, old_tuple[1])
+    else:
+        new_ind[random_position] = (old_tuple[0], random_new_column)
     return new_ind
 
 # Basically makes all values a curve that is 1 when individual_weight = t.
