@@ -6,7 +6,7 @@ import code_utils as cu
 import time
 
 def rand_base_individual(column_num: int) -> list[tuple[int]]:
-    return [[random.randint(0, column_num-1), random.randint(0, column_num-1)]]
+    return [(random.randint(0, column_num-1), random.randint(0, column_num-1))]
 
 # Receives two individuals and generates an offspring from them.
 # Does not modify the original ones.
@@ -25,7 +25,7 @@ def crossover(ind1: list[tuple[int]], ind2: list[tuple[int]]) -> (list[tuple[int
 # Mutates a single individual.
 # It's a not an in place operation.
 # column_num is the number of columns of the H matrix.
-def mutation(individual: list[tuple[int]], column_num: int):
+def mutation(individual: list[tuple[int]], column_num: int, mutation_rate: float):
     if len(individual) <= 0:
         return []
 
@@ -60,13 +60,14 @@ def fitness(s, e, parity_check_matrix, t):
 
 # Returns a pair, the first is the fitness and the second the error iff
 # fitness greater than 0.
-def modified_prange(s, H, t, P):
+def modified_prange(s, H, t, ind):
     """
     s: syndrome
     H: parity check matrix
     t: error correction capability
     """
     m,n = H.shape
+    P = cu.permutation_matrix(n, ind)
     H_hat = cu.multiply_matrices(H, P)
         #U son las transformaciones
     U, H_hat = cu.gaussian_elimination(H_hat, start_column=n-m)
@@ -79,37 +80,39 @@ def modified_prange(s, H, t, P):
     current_weight = np.sum(e_hat)
 
     e = cu.multiply_matrices(np.array([e_hat]), P)
-    return (fitness(s, e, H, t), e)
+    return (fitness(s, e, H, t), e, ind)
 
 def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
     m,n = H.shape
     inds = [rand_base_individual(n) for _ in range(number_of_inds)]
-    results = [modified_prange(s, H, t, cu.permutation_matrix(n, ind)) for ind in inds]
+    results = [modified_prange(s, H, t, ind) for ind in inds]
     best_fit = max(results, key=lambda item: item[0])
     best_weight = np.sum(best_fit[1])
     contador = 0
     while best_weight > t and contador < max_iters:
+        print(contador)
+        print(inds)
         contador+=1
-        inds = next_gen(inds, results, n, mutation_rate)
-        results = [modified_prange(s, H, t, cu.permutation_matrix(n, ind)) for ind in inds]
+        inds = next_gen(results, n, mutation_rate)
+        results = [modified_prange(s, H, t, ind) for ind in inds]
         best_fit = max(results, key=lambda item: item[0])
         best_weight = np.sum(best_fit[1])
     return best_fit[1]
 
-def next_gen(num_inds, results, column_num, mutation_rate=1):
-    survivors = survivors(results)
-    next_gen = copy.deepcopy(survivors)
+def next_gen(results, column_num, mutation_rate=1):
+    survivors_list = survivors(results)
+    next_gen = copy.deepcopy(survivors_list)
 
-    while len(next_gen) < num_inds:
-        parent1 = random.choice(survivors)
-        parent2 = random.choice(survivors)
+    while len(next_gen) < len(results):
+        parent1 = random.choice(survivors_list)
+        parent2 = random.choice(survivors_list)
         child1, child2 = crossover(parent1, parent2)
         child1 = mutation(child1, column_num, mutation_rate)
         child2 = mutation(child2, column_num, mutation_rate)
         next_gen.append(child1)
         next_gen.append(child2)
 
-    next_gen = [next_gen[:num_inds]]
+    next_gen = [next_gen[:len(results)]]
     return next_gen
 
 def survivors(results):
@@ -120,7 +123,9 @@ def survivors(results):
     cumulative_fitness = 0
 
     for ind in ordered:
-        survivors_list.append(ind[1])
+        print(len(survivors_list))
+        print(ind)
+        survivors_list.append(ind[2])
         cumulative_fitness += ind[0]
         if cumulative_fitness >= survivor_number:
             break
