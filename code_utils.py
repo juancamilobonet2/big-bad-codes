@@ -84,7 +84,6 @@ if __name__ == "__main__":
 
 # Number of columns.
 def permutation_matrix(n, list_of_perms):
-    print(list_of_perms)
     identity = np.identity(n)
     for perm in list_of_perms:
         origin, end = perm

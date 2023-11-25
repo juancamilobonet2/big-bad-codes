@@ -1,5 +1,6 @@
 import pytest
 import genetic_prange as gp
+from copy import deepcopy
 
 def test_crossover():
     ind1 = [(0, 1), (1, 2), (3, 2)]
@@ -17,11 +18,16 @@ def test_mutation():
     ind1 = [(0, 1)]
     ind1_2 = gp.mutation(ind1, 2)
     assert ind1_2 == [(0, 1)] or ind1_2 == [(1, 1)] or ind1_2 == [(0, 0)]
-    ind2 = ind1
-    ind2_2 = ind1_2
+    # deep copy ind 1
+    ind2 = deepcopy(ind1)
+    ind2_2 = deepcopy(ind1_2)
     for i in range(10):
-        ind2 = ind2 + ind1_2
+        ind2 = ind2 + ind2_2
         ind2_2 = gp.mutation(ind2, 10)
         # The length is always maintained after the operation.
         assert len(ind2_2) == 2 ** (i+1)
 
+if __name__ == "__main__":
+    test_crossover()
+    test_mutation()
+    print("All tests passed.")
