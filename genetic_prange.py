@@ -1,34 +1,35 @@
 import random
 import copy
 
-def rand_base_individual(column_num):
+def rand_base_individual(column_num: int) -> list[tuple[int]]:
     return [[random.randint(0, column_num-1), random.randint(0, column_num-1)]]
 
-def crossover(ind1, ind2):
-    new_ind1, new_ind2 = [], []
+# Receives two individuals and generates an offspring from them.
+# Does not modify the original ones.
+def crossover(ind1: list[tuple[int]], ind2: list[tuple[int]]) -> (list[tuple[int]], list[tuple[int]]):
     # Decide which genes will be passed to the first individual form
     # original individual 1 and original individual 2.
     genes_from_1 = [random.choice([True, False]) for position in ind1]
     genes_from_2 = [random.choice([True, False]) for position in ind2]
-    # Append to new_ind 1 the original gen of ind1 if gen from 1 was present. 
-    # Append to new_ind2 if not.
-    for index, gen_presence in enumerate(genes_from_1):
-        if gen_presence:
-            new_ind1.append(ind1[index])
-        else:
-            new_ind2.append(ind1[index])
-    # The same but with individual 2.
-    for index, gen_presence in enumerate(genes_from_2):
-        if gen_presence:
-            new_ind1.append(ind2[index])
-        else:
-            new_ind2.append(ind2[index])
+    # New_ind1 receives all True positions
+    new_ind1 = [perm for index, perm in enumerate(ind1) if genes_from_1[index]]\
+        + [perm for index, perm in enumerate(ind2) if genes_from_2[index]]
+    new_ind2 = [perm for index, perm in enumerate(ind1) if not genes_from_1[index]]\
+        + [perm for index, perm in enumerate(ind2) if not genes_from_2[index]]
     return (new_ind1, new_ind2)
 
-def mutation(individual, column_num):
+# Mutates a single individual.
+# It's a not an in place operation.
+# column_num is the number of columns of the H matrix.
+def mutation(individual: list[tuple[int]], column_num: int):
+    # Chooses the random permutation in the individual to mutate.
     random_position = random.randint(0, len(individual)-1)
+    # Chooses between the origin column of the permutation and its destiny column.
+    # If it is 0, the origin was chosen.
     origin_or_destiny = random.randint(0,1)
+    # Generates the new column to be put, must be part of H.
     random_new_column = random.randint(0, column_num-1)
+    A = (decision for decision in [origin_or_destiny, origin_or_destiny^1])
     new_ind = copy.deepcopy(individual)
     new_ind[random_position][origin_or_destiny] = random_new_column
     return new_ind
@@ -70,30 +71,35 @@ def genetic_prange(number_of_inds, mutation_rate, s, H, t):
     inds = [rand_base_individual(n) for _ in range(number_of_inds)]
     results = [modified_prange(s, H, t, cu.permutation_matrix(n, ind)) for ind in inds]
     best_fit = max(results, key=lambda item: item[0])
+    contador = 0
     while best_fit[0] < 1:
-        print("Best fit", best_fit)
-        inds = next_gen(inds, results)
+        contador+=1
+        inds = next_gen(inds, results, n, mutation_rate)
         results = [modified_prange(s, H, t, cu.permutation_matrix(n, ind)) for ind in inds]
         best_fit = max(results, key=lambda item: item[0])
     return best_fit[1]
 
-
-def next_gen(inds, results):
+def next_gen(inds, results, column_num, mutation_rate=1):
     next_gen = []
     survivors_list = survivors(results)
     for index in survivors_list:
         next_gen.append(inds[index])
+    #print("0", next_gen)
     indexed_results = [[index, *ind] for index, ind in enumerate(results)]
     indexed_results.sort(reverse=True, key=lambda item: item[1])
-    for index in range(0, len(inds)-len(survivors_list)-1, 2):
+    for index in range(0, len(inds)-len(survivors_list), 2):
         ind1_index = indexed_results[index][0]
         ind2_index = indexed_results[index+1][0]
         childs = crossover(inds[ind1_index], inds[ind2_index])
         next_gen.append(childs[0])
-        next_gen.append(childs[1])
+        if len(next_gen) < len(inds):
+            next_gen.append(childs[1])
+    mutation_place = random.randint(0, len(next_gen))
+    next_gen[mutation_place] = mutation(next_gen[mutation_place], column_num)
     return next_gen
 
 def survivors(results):
+    print("Results", results)
     fitnesses = [perm[0] for perm in results]
     ponderated_fitnesses = fitnesses/np.sqrt(np.sum(fitnesses)**2) 
     survivors_list = []
@@ -104,6 +110,7 @@ def survivors(results):
             survivors_list.append(index)
     return survivors_list
 
+#print(next_gen([[[0, 1]], [[1, 2]], [[3,4]]],0, [[0.5, []], [0.6, []], [0.1, []]]))
 
 def concat_matrix(matrix):
     # Convierte la matriz NumPy a una cadena
