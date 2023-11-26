@@ -73,7 +73,7 @@ def modified_prange(s, H, t, ind):
     U, H_hat = cu.gaussian_elimination(H_hat, start_column=n-m)
     if not np.array_equal(H_hat[:,n-m:], np.identity(m, dtype=int)):
         # permutacion es valida si h_hat es full rank
-        return (0, None)
+        return (0, np.zeros(n-m, dtype=int), ind)
     s_bar = cu.apply_transforms(U, s)
     e_hat = np.zeros(n-m, dtype=int)
     e_hat = np.hstack((e_hat, s_bar.transpose()[0]))
@@ -83,6 +83,9 @@ def modified_prange(s, H, t, ind):
     return (fitness(s, e, H, t), e, ind)
 
 def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
+    # print("-------------------------------------------------")
+    # print("Genetic Prange")
+    # print(f"{s}, {H}, {t}")
     m,n = H.shape
     inds = [rand_base_individual(n) for _ in range(number_of_inds)]
     results = [modified_prange(s, H, t, ind) for ind in inds]
@@ -90,8 +93,11 @@ def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
     best_weight = np.sum(best_fit[1])
     contador = 0
     while best_weight > t and contador < max_iters:
-        print(contador)
-        print(inds)
+        # print(contador)
+        # for i in range(len(results)):
+        #     print("----------------------------------------------")
+        #     print(inds[i])
+        #     print(results[i])
         contador+=1
         inds = next_gen(results, n, mutation_rate)
         results = [modified_prange(s, H, t, ind) for ind in inds]
@@ -112,7 +118,7 @@ def next_gen(results, column_num, mutation_rate=1):
         next_gen.append(child1)
         next_gen.append(child2)
 
-    next_gen = [next_gen[:len(results)]]
+    next_gen = next_gen[:len(results)]
     return next_gen
 
 def survivors(results):
@@ -123,8 +129,8 @@ def survivors(results):
     cumulative_fitness = 0
 
     for ind in ordered:
-        print(len(survivors_list))
-        print(ind)
+        # print(len(survivors_list))
+        # print(ind)
         survivors_list.append(ind[2])
         cumulative_fitness += ind[0]
         if cumulative_fitness >= survivor_number:
@@ -167,8 +173,7 @@ if __name__ == "__main__":
         computed_s = cu.find_syndrome(H, e)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print("hola")
-        #print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]} \t {100} \t \t {elapsed_time}s")
+        print(f"{test_id}\t \t {np.array_equal(s, computed_s)} \t {s.transpose()[0]} \t {computed_s.transpose()[0]} \t TODO \t \t {elapsed_time}s")
         test_id += 1
         total_time += elapsed_time
     print(f"Average iterations: {total_iters/test_id}")
