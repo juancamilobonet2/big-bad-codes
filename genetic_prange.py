@@ -145,12 +145,13 @@ def concat_matrix(matrix):
 
 if __name__ == "__main__":
     print("Prange's algorithm")
-    h_file = open("./test/goppa_h.txt", "r")
-    H = []
-    for line in h_file:
-        H.append([int(x) for x in list(line.strip())])
-    h_file.close()
-    H = np.array(H)
+    H = cu.file_to_matrix("./test/goppa_h.txt")
+    # G = cu.file_to_matrix("./test/goppa_g.txt")
+    # H = []
+    # for line in h_file:
+    #     H.append([int(x) for x in list(line.strip())])
+    # h_file.close()
+    # H = np.array(H)
 
     test_file = open("./test/goppa_test.txt", "r")
     test = []

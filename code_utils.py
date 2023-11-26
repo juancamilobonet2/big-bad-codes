@@ -1,3 +1,4 @@
+import random
 import numpy as np
 
 # cosas generales de coding theory
@@ -69,18 +70,8 @@ def apply_transforms(U, matrix):
     Applies the transformations in U to matrix
     """
     for i in range(len(U)):
-        # print("-------------------------------------")
-        # print(U[i])
-        # print(matrix)
         matrix = multiply_matrices(U[i], matrix)
     return matrix
-
-#test
-if __name__ == "__main__":
-    parity_check=np.array([[1,1,0,1,0,0],[0,1,1,0,1,0],[1,1,1,0,0,1]])
-    r = np.array([[1,1,0,1,1,0]])
-    print(find_syndrome(parity_check,r))
-    print(random_permutation_matrix(6))
 
 # Number of columns.
 def permutation_matrix(n, list_of_perms):
@@ -91,3 +82,66 @@ def permutation_matrix(n, list_of_perms):
             identity[row_num][origin], identity[row_num][end] = \
                 identity[row_num][end], identity[row_num][origin]
     return identity
+
+def file_to_matrix(file_name):
+    file = open(file_name, "r")
+    matrix = []
+    for line in file:
+        matrix.append([int(x) for x in list(line.strip())])
+    file.close()
+    return np.array(matrix)
+
+def matrix_to_file(matrix, file_name):
+    file = open(file_name, "w")
+    for row in matrix:
+        for element in row:
+            file.write(str(element))
+        file.write("\n")
+    file.close()
+
+def gen_g_h(n, k):
+    """
+    Generates a random generator matrix of size k x n
+    """
+    I = np.identity(k, dtype=int)
+    A = np.random.randint(2, size=(k, n-k))
+
+    G = np.concatenate((I, A), axis=1)
+
+    I_h = np.identity(n-k, dtype=int)
+    H = np.concatenate((A.transpose(), I_h), axis=1)
+
+    return (G,H)
+
+def calculate_min_distance(G):
+    """
+    Calculates the minimum distance of a code given its G
+    """
+    vectors = []
+    for i in range(1,(2**G.shape[0])):
+        vectors.append(np.array([[int(x) for x in list(np.binary_repr(i, width=G.shape[0]))]]))
+    
+    min_distance = G.shape[1]
+    for vector in vectors:
+        word = multiply_matrices(vector, G)
+        weight = np.sum(word)
+        if weight < min_distance and weight != 0:
+            min_distance = weight
+
+    return min_distance
+
+def gen_error(t,n):
+    """
+    Generates a random error vector of size n with t ones
+    """
+    error = np.zeros((1,n),dtype=int)
+    error[0,:t] = 1
+    np.random.shuffle(error[0])
+    return error
+    
+
+if __name__ == "__main__":
+    G, H = gen_g_h(20,8)
+    print(G)
+    print(H)
+    print(calculate_min_distance(G))
