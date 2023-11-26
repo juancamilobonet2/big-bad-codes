@@ -169,7 +169,7 @@ if __name__ == "__main__":
 
         start_time = time.time()
         s = cu.find_syndrome(H, recieved)
-        e = genetic_prange(1000, 10, 0, s,H,t)
+        e = genetic_prange(10, 10, 0, s,H,t)
         computed_s = cu.find_syndrome(H, e)
         end_time = time.time()
         elapsed_time = end_time - start_time
