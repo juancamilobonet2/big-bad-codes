@@ -145,12 +145,13 @@ def concat_matrix(matrix):
 
 if __name__ == "__main__":
     print("Prange's algorithm")
-    h_file = open("./test/goppa_h.txt", "r")
-    H = []
-    for line in h_file:
-        H.append([int(x) for x in list(line.strip())])
-    h_file.close()
-    H = np.array(H)
+    H = cu.file_to_matrix("./test/goppa_h.txt")
+    # G = cu.file_to_matrix("./test/goppa_g.txt")
+    # H = []
+    # for line in h_file:
+    #     H.append([int(x) for x in list(line.strip())])
+    # h_file.close()
+    # H = np.array(H)
 
     test_file = open("./test/goppa_test.txt", "r")
     test = []
@@ -169,7 +170,7 @@ if __name__ == "__main__":
 
         start_time = time.time()
         s = cu.find_syndrome(H, recieved)
-        e = genetic_prange(1000, 10, 0, s,H,t)
+        e = genetic_prange(0, 10, 0, s,H,t)
         computed_s = cu.find_syndrome(H, e)
         end_time = time.time()
         elapsed_time = end_time - start_time
