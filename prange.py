@@ -27,7 +27,7 @@ def prange(s, H, t):
         e_hat = np.hstack((e_hat, s_bar.transpose()[0]))
 
         current_weight = np.sum(e_hat)
-    return cu.multiply_matrices(np.array([e_hat]), rand_permutation)
+    return cu.multiply_matrices(np.array([e_hat]), rand_permutation.transpose())
 
 def concat_matrix(matrix):
     # Convierte la matriz NumPy a una cadena
