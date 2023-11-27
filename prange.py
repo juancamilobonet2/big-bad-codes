@@ -12,7 +12,6 @@ def prange(s, H, t):
     m,n = H.shape
     current_weight = math.inf
     while current_weight > t:
-        
         permutation_chosen = False
         while not permutation_chosen:
             rand_permutation = cu.random_permutation_matrix(n)

@@ -51,11 +51,9 @@ def fitness(s, e, parity_check_matrix, t):
     new_syndrome = cu.find_syndrome(parity_check_matrix, e)
     if np.array_equal(s, new_syndrome):
         fitness = len(e[0])
-    
     for i in range(len(e[0])):
         if e[0][i] == 0:
             fitness += 1
-
     return fitness
 
 # Returns a pair, the first is the fitness and the second the error iff
@@ -93,11 +91,6 @@ def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
     best_weight = np.sum(best_fit[1])
     contador = 0
     while best_weight > t and contador < max_iters:
-        # print(contador)
-        # for i in range(len(results)):
-        #     print("----------------------------------------------")
-        #     print(inds[i])
-        #     print(results[i])
         contador+=1
         inds = next_gen(results, n, mutation_rate)
         results = [modified_prange(s, H, t, ind) for ind in inds]
