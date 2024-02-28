@@ -19,7 +19,7 @@ import numpy as np
 #     def get_matrix(self):
 #         return self.matrix
     
-# operaciones modulo 2
+# operaciones modulo n
 def add_matrices(matrix1, matrix2):
     return (matrix1 + matrix2) % 2
 
@@ -138,6 +138,14 @@ def gen_error(t,n):
     error[0,:t] = 1
     np.random.shuffle(error[0])
     return error
+
+def gen_word(G):
+    """
+    Generates a random word of size k with G
+    """
+    vector = np.random.randint(2, size=(1,G.shape[0]))
+    word = multiply_matrices(vector[0], G)
+    return word
     
 
 if __name__ == "__main__":
