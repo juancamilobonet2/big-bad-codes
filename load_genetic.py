@@ -5,15 +5,8 @@ import code_utils as cu
 import time
 import prange as pr
 
-# Generates a matrix of the form (I, I, I, ...) as much times as 
-# times_identity. row_num determines the size of the identity.
-# def generate_superI_matrix(row_num, times_identity):
-#     return np.concatenate(
-#         [np.identity(row_num, dtype=int) for _ in range(times_identity)], 
-#         axis=1
-#     )
 
-def load(k,n, load=False):
+def load(load=False):
     # if load:
     #     G = cu.file_to_matrix(f'./data/goppa_g.txt')
     #     H = cu.file_to_matrix(f'./data/goppa_h.txt')
@@ -31,27 +24,25 @@ def load(k,n, load=False):
     # print("time: ", gelapsed_time)
     # print("-----------------------------------")
     #GOPPA
-    # n,k = 500,450
-    F = GF(2**3)
-    R = F['x']; (x,) = R._first_ngens(1) 
-    g = x**Integer(3) +x+ Integer(1)
-    L = [a for a in F.list() if g(a) != 0]
-    C = codes.GoppaCode(g, L)
-    # E = codes.encoders.GoppaCodeEncoder(C)
-    H = C.parity_check_matrix()
-    G = C.generator_matrix()
-    codeword = C.random_element()
-    t= (C.minimum_distance()-1)//2
-
-
-    #REED SOLOMON
-    # C = codes.GoppaCode(F.list()[:n], k)
+    # R = F['x']; (x,) = R._first_ngens(1) 
+    # g = x**Integer(3) +x+ Integer(1)
+    # L = [a for a in F.list() if g(a) != 0]
+    # C = codes.GoppaCode(g, L)
+    # # E = codes.encoders.GoppaCodeEncoder(C)
     # H = C.parity_check_matrix()
+    # G = C.generator_matrix()
     # codeword = C.random_element()
     # t= (C.minimum_distance()-1)//2
+
+    #REED SOLOMON
+    n,k = 10,5
+    F = GF(11)
+    C = codes.GeneralizedReedSolomonCode(F.list()[:n], k)
+    H = C.parity_check_matrix()
+    codeword = C.random_element()
+    t= (C.minimum_distance()-1)//2
     print(t)
     n = H.dimensions()[1]
-    # t=2
     Chan = channels.StaticErrorRateChannel(C.ambient_space(), t)
     test = [Chan(codeword)]
 
@@ -63,7 +54,6 @@ def load(k,n, load=False):
     # Experiments time.
     print(f"Original syndrome: {s}")
     print(f"Original word: {word}")
-    # print(f"error: {error}")
     print(f"received: {received}")
 
     rstart_time = time.time()
@@ -84,6 +74,6 @@ def load(k,n, load=False):
                     Time: {gelapsed_time}
                     ''')
 
-for i in range(15, 42, 40):
-    print(f"-------- Iteration {i} --------")
-    load(i, 6, load=True) 
+if __name__ == '__main__':
+    print(f"-------- Iteration 1 --------")
+    load(load=True) 

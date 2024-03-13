@@ -70,9 +70,6 @@ def modified_prange(s, H, t, ind):
     H_hat = cu.multiply_matrices(H, P)
         #U son las transformaciones
     U, H_hat = cu.gaussian_elimination(H_hat, start_column=n-m)
-    # if H_hat.rank() == m:
-    #     # permutacion es valida si h_hat es full rank
-    #     return (0, zero_vector(n-m), ind)
     s_bar = U*s
     e_hat = zero_vector(n-m)
     e_hat = vector(e_hat.list() + s_bar.list())

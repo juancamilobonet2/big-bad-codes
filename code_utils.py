@@ -53,33 +53,6 @@ def gaussian_elimination(matrix_in, start_column=0):
     else:
         U = submat.inverse()
         return (U, U*matrix_in)
-    
-
-    # U son las transformaciones que se le hacen a la matriz
-    # U = matrix.identity(m)
-    # for i in range(m):
-    #     column = i + start_column
-    #     # find row with 1 in the ith place
-    #     for j in range(i,m):
-    #         if matrix_in[j,column] == 1:
-    #             matrix_in[[i,j]] = matrix_in[[j,i]]
-    #             transform = matrix.identity(m)
-    #             transform[[i,j]] = transform[[j,i]]
-    #             # U.append(transform)
-    #             U = transform * U
-    #             break
-    #     for j in range(m):
-    #         if matrix_in[j,column] == 1 and j != i:
-    #             matrix_in[j] = add_matrices(matrix_in[j], matrix_in[i])
-    #             transform = matrix.identity(m)
-    #             transform[j] = add_matrices(transform[j], transform[i])
-    #             # U.append(transform)
-    #             U = transform * U
-    # p = permutation_matrix(matrix.ncolumns(), [(0+i, start_column+i) for i in range(matrix.ncolumns()-start_column)])
-    # m = matrix * p
-    # m, u = m.echelon_form(transformation=True)
-
-    return (U,matrix_in)
 
 def apply_transforms(U, matrix):
     """
