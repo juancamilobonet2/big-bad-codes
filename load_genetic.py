@@ -30,13 +30,26 @@ def load(k,n, load=False):
     # print("Minimum distance: ", m)
     # print("time: ", gelapsed_time)
     # print("-----------------------------------")
-    n,k = 10,5
-    F = GF(11)
-    C = codes.GeneralizedReedSolomonCode(F.list()[:n], k)
+    #GOPPA
+    # n,k = 500,450
+    F = GF(2**3)
+    R = F['x']; (x,) = R._first_ngens(1) 
+    g = x**Integer(3) +x+ Integer(1)
+    L = [a for a in F.list() if g(a) != 0]
+    C = codes.GoppaCode(g, L)
+    # E = codes.encoders.GoppaCodeEncoder(C)
     H = C.parity_check_matrix()
+    G = C.generator_matrix()
     codeword = C.random_element()
     t= (C.minimum_distance()-1)//2
-    
+
+
+    #REED SOLOMON
+    # C = codes.GoppaCode(F.list()[:n], k)
+    # H = C.parity_check_matrix()
+    # codeword = C.random_element()
+    # t= (C.minimum_distance()-1)//2
+    print(t)
     n = H.dimensions()[1]
     # t=2
     Chan = channels.StaticErrorRateChannel(C.ambient_space(), t)
