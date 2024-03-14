@@ -1,7 +1,5 @@
 import random as rand
 import copy as copy_lib
-# import numpy as np
-import math
 import code_utils as cu
 import time
 from sage.all import *

@@ -1,4 +1,3 @@
-import numpy as np
 import math
 import code_utils as cu
 import time
