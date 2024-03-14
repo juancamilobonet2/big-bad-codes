@@ -1,33 +1,31 @@
-import random
 import numpy as np
+from sage.all import *
 
 # cosas generales de coding theory
-
-# creo que en vd no hace falta
-# class Binary_Matrix:
-#     def __init__(self,n,k, matrix=[]):
-#         self.n = n
-#         self.k = k
-#         if matrix == []:
-#             self.matrix = np.zeros((k,n),dtype=int)
-#         else:
-#             self.matrix = matrix
     
-#     def __str__(self):
-#         return str(self.matrix)
+def create_matrix(p, values):
+    return matrix(GF(Integer(p)), values)
 
-#     def get_matrix(self):
-#         return self.matrix
-    
-# operaciones modulo n
+def create_vector(p, values):
+    return vector(GF(Integer(p)), values)
+
+# DEPRECATED: just add them normally
 def add_matrices(matrix1, matrix2):
-    return (matrix1 + matrix2) % 2
+    return (matrix1 + matrix2)
 
+# DEPRECATED: just multiply them normally
 def multiply_matrices(matrix1, matrix2):
-    return (matrix1 @ matrix2) % 2
+    return (matrix1 * matrix2)
 
 def find_syndrome(parity_check_matrix, vector):
-    return (multiply_matrices(parity_check_matrix, vector.transpose()))
+    return (parity_check_matrix * vector)
+
+def permutation_matrix(n, two_perms):
+    p = matrix.identity(n)
+    for perm in two_perms:
+        origin, end = perm
+        p.swap_columns(origin, end)
+    return p
 
 def random_permutation_matrix(n):
     """
@@ -35,35 +33,26 @@ def random_permutation_matrix(n):
     """
     permutation = [i for i in range(1,n+1)]
     permutation = np.random.permutation(permutation)
-    permutation_matrix = np.zeros((n,n),dtype=int)
+    permutation_matrix = matrix.zero(n)
     for i in range(n):
         permutation_matrix[i,permutation[i]-1] = 1
-    return permutation_matrix
+    return matrix(permutation_matrix)
 
-def gaussian_elimination(matrix, start_column=0):
+def gaussian_elimination(matrix_in, start_column=0):
     """
     Gaussian elimination modulo 2
     """
-    m, n = matrix.shape
-    # U son las transformaciones que se le hacen a la matriz
-    U = []
-    for i in range(m):
-        column = i + start_column
-        # find row with 1 in the ith place
-        for j in range(i,m):
-            if matrix[j,column] == 1:
-                matrix[[i,j]] = matrix[[j,i]]
-                transform = np.identity(m, dtype=int)
-                transform[[i,j]] = transform[[j,i]]
-                U.append(transform)
-                break
-        for j in range(m):
-            if matrix[j,column] == 1 and j != i:
-                matrix[j] = add_matrices(matrix[j], matrix[i])
-                transform = np.identity(m, dtype=int)
-                transform[j] = add_matrices(transform[j], transform[i])
-                U.append(transform)
-    return (U,matrix)
+    
+    m = matrix_in.nrows()
+    mat = copy(matrix_in)
+    mat.subdivide(col_lines=start_column)
+    submat = mat.subdivision(0,1)
+    determinant = submat.determinant()
+    if determinant == 0:
+        return (matrix.identity(m), matrix_in)
+    else:
+        U = submat.inverse()
+        return (U, U*matrix_in)
 
 def apply_transforms(U, matrix):
     """
@@ -75,24 +64,29 @@ def apply_transforms(U, matrix):
 
 # Number of columns.
 def permutation_matrix(n, list_of_perms):
-    identity = np.identity(n)
+    identity = matrix.identity(n)
     for perm in list_of_perms:
         origin, end = perm
-        for row_num in range(len(identity)):
-            identity[row_num][origin], identity[row_num][end] = \
-                identity[row_num][end], identity[row_num][origin]
+        for row_num in range(n):
+            identity[row_num,origin], identity[row_num,end] = \
+                identity[row_num,end], identity[row_num,origin]
     return identity
+
 
 def file_to_matrix(file_name):
     file = open(file_name, "r")
+    p = 0
     matrix = []
-    for line in file:
+    lines = file.readlines()
+    p = int(lines.pop(0))
+    for line in lines:
         matrix.append([int(x) for x in list(line.strip())])
     file.close()
-    return np.array(matrix)
+    return create_matrix(p, matrix)
 
 def matrix_to_file(matrix, file_name):
     file = open(file_name, "w")
+    file.write(str(matrix.base_ring().order()))
     for row in matrix:
         for element in row:
             file.write(str(element))
@@ -143,9 +137,10 @@ def gen_word(G):
     """
     Generates a random word of size k with G
     """
-    vector = np.random.randint(2, size=(1,G.shape[0]))
+    vector = G.linear_combination_of_rows() 
     word = multiply_matrices(vector[0], G)
     return word
+
     
 
 if __name__ == "__main__":
