@@ -1,5 +1,5 @@
 import pytest
-import genetic_prange as gp
+import src.genetic_prange as gp
 from copy import deepcopy
 
 def test_crossover():

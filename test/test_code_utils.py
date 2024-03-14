@@ -1,4 +1,4 @@
-import code_utils as cu
+import src.code_utils as cu
 from sage.all import *
 
 def test_matrix_creation():

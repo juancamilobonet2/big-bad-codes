@@ -1,10 +1,11 @@
-# import numpy as np
 from sage.all import *
+import time
+import sys
+sys.path.append("./src/")
+
 import genetic_prange as gp
 import code_utils as cu
-import time
 import prange as pr
-
 
 def load(load=False):
     # if load:
