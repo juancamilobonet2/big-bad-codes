@@ -91,6 +91,7 @@ def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
         results = [modified_prange(s, H, t, ind) for ind in inds]
         best_fit = max(results, key=lambda item: item[0])
         best_weight = best_fit[1].hamming_weight()
+    print(f"max_iters: {max_iters}")
     return best_fit[1]
 
 def next_gen(results, column_num, mutation_rate=1):
@@ -170,8 +171,10 @@ if __name__ == "__main__":
         computed_s = cu.find_syndrome(H, e)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print(f"{test_id}\t \t {s==computed_s} \t {s} \t {computed_s} \t TODO \t \t {elapsed_time}s")
+        print(f"{test_id}\t \t {e==test[0]-codeword} \t {s} \t {computed_s} \t TODO \t \t {elapsed_time}s")
         test_id += 1
         total_time += elapsed_time
     print(f"Average iterations: {total_iters/test_id}")
     print(f"Average time: {total_time/test_id}s")
+    print(test[0]-codeword)
+    print(e)

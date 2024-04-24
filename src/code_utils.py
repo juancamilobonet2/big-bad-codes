@@ -112,8 +112,8 @@ def calculate_min_distance(G):
     Calculates the minimum distance of a code given its G
     """
     vectors = []
-    for i in range(1,(2**G.shape[0])):
-        vectors.append(np.array([[int(x) for x in list(np.binary_repr(i, width=G.shape[0]))]]))
+    # for i in range(1,(2**G.shape[0])):
+    #     vectors.append(np.array([[int(x) for x in list(np.binary_repr(i, width=G.shape[0]))]]))
     
     min_distance = G.shape[1]
     for vector in vectors:
@@ -128,10 +128,10 @@ def gen_error(t,n):
     """
     Generates a random error vector of size n with t ones
     """
-    error = np.zeros((1,n),dtype=int)
-    error[0,:t] = 1
-    np.random.shuffle(error[0])
-    return error
+    # error = np.zeros((1,n),dtype=int)
+    # error[0,:t] = 1
+    # np.random.shuffle(error[0])
+    pass
 
 def gen_word(G):
     """
@@ -141,6 +141,49 @@ def gen_word(G):
     word = multiply_matrices(vector[0], G)
     return word
 
+def read_dc_file(file_path):
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+    n = None
+    k = None
+    w = None
+    H_transpose = []
+    s_transpose = None
+
+    current_section = None
+    for line in lines:
+        line = line.strip()
+
+        if line.startswith('# n'):
+            current_section = 'n'
+            continue
+        elif line.startswith('# k'):
+            current_section = 'k'
+            continue
+        elif line.startswith('# w'):
+            current_section = 'w'
+            continue
+        elif line.startswith('# H^transpose'):
+            current_section = 'H_transpose'
+            continue
+        elif line.startswith('# s^transpose'):
+            current_section = 's_transpose'
+            continue
+
+        if current_section == 'n':
+            n = int(line)
+        elif current_section == 'k':
+            k = int(line)
+        elif current_section == 'w':
+            w = int(line)
+        elif current_section == 'H_transpose':
+            values = [int(char) for char in line]
+            H_transpose.append(values)
+        elif current_section == 's_transpose':
+            s_transpose = [int(char) for char in line]
+
+    return n, k, w, matrix(H_transpose), vector(s_transpose)
     
 
 if __name__ == "__main__":
