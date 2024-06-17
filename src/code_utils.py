@@ -184,6 +184,12 @@ def read_dc_file(file_path):
             s_transpose = [int(char) for char in line]
 
     return n, k, w, matrix(H_transpose), vector(s_transpose)
+
+def choose(n, k):
+    """
+    Returns a random subset of k elements from a set of n elements
+    """
+    return factorial(n) / (factorial(k) * factorial(n-k))
     
 
 if __name__ == "__main__":
