@@ -15,6 +15,14 @@ def mmt_isd(H, s, w, l, p, num_iterations=1000):
 
     for _ in range(num_iterations):
         rand_permutation = cu.random_permutation_matrix(H.ncols())
+        hp = H*rand_permutation
+
+        result = cu.submatrix_gaussian_elimination(hp, H.nrows()-l)
+        if result == None:
+            continue
+        
+        (G, H_bar) = result
+        s_bar = G*s
 
 
     pass

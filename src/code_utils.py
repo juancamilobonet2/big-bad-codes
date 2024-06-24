@@ -40,7 +40,8 @@ def random_permutation_matrix(n):
 
 def gaussian_elimination(matrix_in, start_column=0):
     """
-    Gaussian elimination modulo 2
+    Gaussian elimination
+    kind of deprecated
     """
     
     m = matrix_in.nrows()
@@ -53,6 +54,28 @@ def gaussian_elimination(matrix_in, start_column=0):
     else:
         U = submat.inverse()
         return (U, U*matrix_in)
+
+def submatrix_gaussian_elimination(input_matrix, i_size):
+    """
+    Gaussian elimination for submatrices, I will be at top left
+    """
+    mat = copy(input_matrix)
+    mat.subdivide(col_lines=i_size, row_lines=i_size)
+    submat = mat.subdivision(0,0)
+    determinant = submat.determinant()
+    mini = mat.subdivision(1,0)
+    mini_full = block_matrix([[matrix.identity(i_size), mat.nrows-i_size],
+                             [mini, matrix.identity(mat.nrows()-i_size)]])
+    mini_det = mini_full.determinant()
+    if determinant*mini_det == 0:
+        return None
+    else:
+        B = block_matrix([[U, matrix(i_size, mat.nrows() - i_size)], 
+                          [matrix(mat.nrows() - i_size, i_size), matrix.identity(mat.nrows()-i_size)]])
+        G = mini_full.inverse()*B
+        return (G, G*matrix)
+
+    pass
 
 def apply_transforms(U, matrix):
     """
