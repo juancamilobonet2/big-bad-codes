@@ -41,7 +41,7 @@ def load(load=False):
     # H = C.parity_check_matrix()
     # codeword = C.random_element()
     # t= (C.minimum_distance()-1)//2
-    n, k, w, H_transpose, s_transpose = cu.read_dc_file('./data/challenge_goppa_mc_48.txt')
+    n, k, w, H_transpose, s_transpose = cu.read_dc_file('./data/challenge_goppa_mc_80.txt')
     H = H_transpose.transpose()
     H = H.change_ring(GF(2))
     H = block_matrix([[H, identity_matrix(GF(2), n - k)]], subdivide=False)
@@ -50,7 +50,7 @@ def load(load=False):
     print(n)
     print(k)
     print(w)
-    print(H)
+    # print(H)
     print(s_transpose)
     print(H.dimensions())
 
@@ -74,25 +74,25 @@ def load(load=False):
     computed_rs = cu.find_syndrome(H, re)
     print(f'''*** Prange
                 Computed: {computed_rs}
-                Equal: {s == computed_rs}
+                Equal: {(s == computed_rs) and (re.hamming_weight() == w)}
                 Time: {relapsed_time}s''')
     gstart_time = time.time()
-    ge = gp.genetic_prange(math.inf, 1000, 1, s, H, w)
+    ge = gp.genetic_prange(math.inf, 1000, 0.5, s, H, w)
     gelapsed_time = time.time() - gstart_time
     computed_gs = cu.find_syndrome(H, ge)
     print(f'''*** Genetic Prange
                     Computed: {computed_gs}
-                    Equal: {s == computed_gs} 
+                    Equal: {(s == computed_gs) and (ge.hamming_weight() == w)}
                     Time: {gelapsed_time}
                     ''')
 
-    error_real = "000000000000000000010000000000000000000000000000"
-    error_real = vector(GF(2), [int(i) for i in error_real])
-    print(ge)
-    print(error_real)
-    print(H*error_real)
-    print(s)
-    print(f"right? {cu.find_syndrome(H, error_real) == s}")
+    # error_real = "000000000000000000010000000000000000000000000000"
+    # error_real = vector(GF(2), [int(i) for i in error_real])
+    # print(ge)
+    # print(error_real)
+    # print(H*error_real)
+    # print(s)
+    # print(f"right? {cu.find_syndrome(H, error_real) == s}")
 
 if __name__ == '__main__':
     print(f"-------- Iteration 1 --------")

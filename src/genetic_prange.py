@@ -28,6 +28,9 @@ def mutation(individual: list[tuple[int]], column_num: int, mutation_rate: float
     if len(individual) <= 0:
         return []
 
+    if rand.random() > mutation_rate:
+        return individual
+
     # Chooses the random permutation in the individual to mutate.
     random_position = rand.randint(0, len(individual)-1)
     # Chooses between the origin column of the permutation and its destiny column.
@@ -48,6 +51,8 @@ def mutation(individual: list[tuple[int]], column_num: int, mutation_rate: float
 def fitness(s, e, parity_check_matrix, t):
     fitness = 0
     new_syndrome = cu.find_syndrome(parity_check_matrix, e)
+    if e.hamming_weight() == t:
+        return math.inf
     if s==new_syndrome:
         fitness = len(e)
     for i in range(len(e)):
@@ -85,7 +90,7 @@ def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
     best_fit = max(results, key=lambda item: item[0])
     best_weight = best_fit[1].hamming_weight()
     contador = 0
-    while best_weight > t and contador < max_iters:
+    while best_weight != t and contador < max_iters:
         contador+=1
         inds = next_gen(results, n, mutation_rate)
         results = [modified_prange(s, H, t, ind) for ind in inds]
