@@ -80,6 +80,7 @@ if __name__ == "__main__":
 
         print(f"{test_id}\t \t {s == computed_s} \t {s} \t {computed_s} \t {iterations} \t \t {elapsed_time}s")
         print(e)
+        print(f"CORRECT??????????// {test[0]-codeword == e}")
         test_id += 1
         total_iters += iterations
         total_time += elapsed_time

@@ -51,13 +51,13 @@ def mutation(individual: list[tuple[int]], column_num: int, mutation_rate: float
 def fitness(s, e, parity_check_matrix, t):
     fitness = 0
     new_syndrome = cu.find_syndrome(parity_check_matrix, e)
-    if e.hamming_weight() == t:
+    if e.hamming_weight() == t and s == new_syndrome:
         return math.inf
     if s==new_syndrome:
         fitness = len(e)
-    for i in range(len(e)):
-        if e[i] == 0:
-            fitness += 1
+    fitness += t-e.hamming_weight()
+    if fitness < 0:
+        fitness = 0
     return fitness
 
 # Returns a pair, the first is the fitness and the second the error iff
@@ -78,7 +78,10 @@ def modified_prange(s, H, t, ind):
     e_hat = vector(e_hat.list() + s_bar.list())
 
     e = e_hat*P.transpose()
-    return (fitness(s, e, H, t), e, ind)
+    if H_hat.rank() != m:
+        return (0, e, ind)
+    else:
+        return (fitness(s, e, H, t), e, ind)
 
 def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
     # print("-------------------------------------------------")
@@ -96,7 +99,6 @@ def genetic_prange(max_iters, number_of_inds, mutation_rate, s, H, t):
         results = [modified_prange(s, H, t, ind) for ind in inds]
         best_fit = max(results, key=lambda item: item[0])
         best_weight = best_fit[1].hamming_weight()
-    print(f"max_iters: {max_iters}")
     return best_fit[1]
 
 def next_gen(results, column_num, mutation_rate=1):
@@ -118,7 +120,7 @@ def next_gen(results, column_num, mutation_rate=1):
 def survivors(results):
     fitness_sum = sum([result[0] for result in results])
     survivors_list = []
-    ordered = sorted(results, key=lambda item: item[0])
+    ordered = sorted(results, key=lambda item: item[0], reverse=True)
     survivor_number = rand.randint(0, fitness_sum)
     cumulative_fitness = 0
 
